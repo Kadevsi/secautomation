@@ -1,0 +1,27 @@
+name: Create Release Version Tag
+on:
+  push:
+    tags:
+      - 'off-v'
+    branches:
+      - develop
+jobs:
+  build:
+    name: create_release_tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Authenticate with private NPM package
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: Set version identifier (based on package.json)
+        shell: bash
+        run: |
+          git config user.email rafkienl@gmail.com
+          git config user.name  Kadevsi
+          TAG="release-$(git rev-parse --short HEAD)"
+          git tag $TAG -a -m "$TAG"
+          git push --tag
+      
